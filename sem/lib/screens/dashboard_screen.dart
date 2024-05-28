@@ -1,20 +1,56 @@
 import 'package:flutter/material.dart';
+import 'api_service.dart';
 
-class DashboardScreen extends StatelessWidget {
-  final List<Map<String, String>> tournaments = [
-    {
-      'name': 'Basketball Championship',
-      'startDate': '2024-06-01',
-      'endDate': '2024-06-10',
-      'location': 'Sports Arena',
-    },
-    {
-      'name': 'Soccer League',
-      'startDate': '2024-07-15',
-      'endDate': '2024-07-30',
-      'location': 'City Stadium',
-    },
-  ];
+class DashboardScreen extends StatefulWidget {
+  @override
+  _DashboardScreenState createState() => _DashboardScreenState();
+}
+
+class _DashboardScreenState extends State<DashboardScreen> {
+  final ApiService apiService = ApiService(baseUrl: 'http://your-backend-url/api');
+
+  List<Map<String, String>> tournaments = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchTournaments();
+  }
+
+  void fetchTournaments() async {
+    try {
+      final fetchedTournaments = await apiService.getTournaments();
+      setState(() {
+        tournaments = fetchedTournaments;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load tournaments')),
+      );
+    }
+  }
+
+  void registerForTournament(String tournamentId) async {
+    try {
+      // Call the API to register the user for the tournament with the given ID
+      await apiService.registerForTournament(tournamentId);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Successfully registered for the tournament')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to register for the tournament')),
+      );
+    }
+  }
+
+  void logout() {
+    // Perform logout actions here
+    
+
+    // Navigate to login screen
+    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +62,7 @@ class DashboardScreen extends StatelessWidget {
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
-              // Navigate to add event screen
+              Navigator.pushNamed(context, '/add-event');
             },
           ),
         ],
@@ -60,7 +96,7 @@ class DashboardScreen extends StatelessWidget {
               leading: Icon(Icons.logout),
               title: Text('Logout'),
               onTap: () {
-                // Handle logout
+                logout();
               },
             ),
           ],
@@ -82,7 +118,8 @@ class DashboardScreen extends StatelessWidget {
                 ),
                 trailing: ElevatedButton(
                   onPressed: () {
-                    // Handle registration logic
+                    // Pass the tournament ID to the registration function
+                    registerForTournament(tournament['id']!);
                   },
                   child: Text('Register'),
                 ),

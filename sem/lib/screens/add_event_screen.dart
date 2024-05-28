@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'api_service.dart';
 
 class AddEventScreen extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
@@ -6,6 +7,8 @@ class AddEventScreen extends StatelessWidget {
   final TextEditingController _startDateController = TextEditingController();
   final TextEditingController _endDateController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
+
+  final ApiService apiService = ApiService(baseUrl: 'http://your-backend-url/api');
 
   @override
   Widget build(BuildContext context) {
@@ -77,9 +80,21 @@ class AddEventScreen extends StatelessWidget {
               ),
               SizedBox(height: 20.0),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    // Handle add event logic
+                    try {
+                      await apiService.addEvent({
+                        'name': _nameController.text,
+                        'startDate': _startDateController.text,
+                        'endDate': _endDateController.text,
+                        'location': _locationController.text,
+                      });
+                      Navigator.pop(context);
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Failed to add event')),
+                      );
+                    }
                   }
                 },
                 child: Text('Add Event'),

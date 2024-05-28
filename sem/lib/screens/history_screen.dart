@@ -1,14 +1,34 @@
 import 'package:flutter/material.dart';
+import 'api_service.dart';
 
-class HistoryScreen extends StatelessWidget {
-  final List<Map<String, String>> registeredEvents = [
-    {
-      'name': 'Basketball Championship',
-      'startDate': '2024-06-01',
-      'endDate': '2024-06-10',
-      'location': 'Sports Arena',
-    },
-  ];
+class HistoryScreen extends StatefulWidget {
+  @override
+  _HistoryScreenState createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends State<HistoryScreen> {
+  final ApiService apiService = ApiService(baseUrl: 'http://your-backend-url/api');
+
+  List<Map<String, String>> registeredEvents = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchRegisteredEvents();
+  }
+
+  void fetchRegisteredEvents() async {
+    try {
+      final fetchedEvents = await apiService.getRegisteredEvents();
+      setState(() {
+        registeredEvents = fetchedEvents;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load registered events')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

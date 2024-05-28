@@ -4,6 +4,8 @@ import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/add_event_screen.dart';
+import 'screens/profile_screen.dart';
+import 'screens/history_screen.dart';
 
 void main() {
   runApp(MyApp());
@@ -25,6 +27,8 @@ class MyApp extends StatelessWidget {
         '/register': (context) => RegisterScreen(),
         '/dashboard': (context) => DashboardScreen(),
         '/add-event': (context) => AddEventScreen(),
+        '/profile': (context) => ProfileScreen(),
+        '/history': (context) => HistoryScreen(),
       },
     );
   }

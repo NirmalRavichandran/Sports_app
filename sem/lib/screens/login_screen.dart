@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'api_service.dart';
 
 class LoginScreen extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  final ApiService apiService = ApiService(baseUrl: 'http://your-backend-url/api');
 
   @override
   Widget build(BuildContext context) {
@@ -17,24 +20,11 @@ class LoginScreen extends StatelessWidget {
         child: Form(
           key: _formKey,
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                'Welcome Back!',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 32.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blue,
-                ),
-              ),
-              SizedBox(height: 30.0),
               TextFormField(
                 controller: _usernameController,
                 decoration: InputDecoration(
                   labelText: 'Username',
-                  prefixIcon: Icon(Icons.person),
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
@@ -49,7 +39,6 @@ class LoginScreen extends StatelessWidget {
                 controller: _passwordController,
                 decoration: InputDecoration(
                   labelText: 'Password',
-                  prefixIcon: Icon(Icons.lock),
                   border: OutlineInputBorder(),
                 ),
                 obscureText: true,
@@ -62,9 +51,19 @@ class LoginScreen extends StatelessWidget {
               ),
               SizedBox(height: 20.0),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate()) {
-                    Navigator.pushReplacementNamed(context, '/dashboard');
+                    try {
+                      await apiService.login(
+                        _usernameController.text,
+                        _passwordController.text,
+                      );
+                      Navigator.pushReplacementNamed(context, '/dashboard');
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Failed to login')),
+                      );
+                    }
                   }
                 },
                 child: Text('Login'),
@@ -72,16 +71,6 @@ class LoginScreen extends StatelessWidget {
                   backgroundColor: Colors.blue,
                   padding: EdgeInsets.symmetric(vertical: 16.0),
                   textStyle: TextStyle(fontSize: 18.0),
-                ),
-              ),
-              SizedBox(height: 20.0),
-              TextButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/register');
-                },
-                child: Text(
-                  'Don\'t have an account? Sign Up',
-                  style: TextStyle(color: Colors.blue),
                 ),
               ),
             ],
